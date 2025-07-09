@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36221.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fabric-core", "fabric-core\fabric-core.csproj", "{04D76DA9-9D87-4021-B2F9-9C213C740D0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fabric-agent", "fabric-agent\fabric-agent.csproj", "{C5D538A2-BC29-4E9F-9198-5138895BFCB7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04D76DA9-9D87-4021-B2F9-9C213C740D0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04D76DA9-9D87-4021-B2F9-9C213C740D0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04D76DA9-9D87-4021-B2F9-9C213C740D0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04D76DA9-9D87-4021-B2F9-9C213C740D0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5D538A2-BC29-4E9F-9198-5138895BFCB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5D538A2-BC29-4E9F-9198-5138895BFCB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5D538A2-BC29-4E9F-9198-5138895BFCB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5D538A2-BC29-4E9F-9198-5138895BFCB7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2D189021-54CA-420E-9FCE-B57E3CAADC1F}
+	EndGlobalSection
+EndGlobal
