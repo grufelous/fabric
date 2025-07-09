@@ -1,19 +1,19 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using fabric_core.services.core_hub;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SignalR;
 
+namespace fabric_core.services.auth_hub;
 
-namespace fabric_core.services.core_hub;
-
-internal class SignalRWorker: BackgroundService
+internal class SignalRAuthWorker: BackgroundService
 {
-    //private IHost? _webHost;
     private WebApplication? _webApp;
 
-    protected override async Task ExecuteAsync(CancellationToken cancellationToken) 
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         WebApplicationBuilder webApplicationBuilder = WebApplication.CreateBuilder();
 
@@ -21,7 +21,9 @@ internal class SignalRWorker: BackgroundService
         webApplicationBuilder.Logging.SetMinimumLevel(LogLevel.Debug);
 
         webApplicationBuilder.WebHost.UseKestrel()
-            .UseUrls("http://localhost:5000");
+            .UseUrls("http://localhost:5001");
+
+        webApplicationBuilder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
 
         webApplicationBuilder.Services.AddCors(options =>
         {
@@ -58,12 +60,7 @@ internal class SignalRWorker: BackgroundService
 
     public override async Task StopAsync(CancellationToken stoppingToken)
     {
-        //if(_webHost != null)
-        //{
-        //    await _webHost.StopAsync(stoppingToken);
-        //}
-
-        if(_webApp != null)
+        if (_webApp != null)
         {
             await _webApp.StopAsync(stoppingToken);
         }
