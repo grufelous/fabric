@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.Extensions.Logging;
 
 
-namespace fabric_core;
+namespace fabric_core.services.core_hub;
 
 internal class SignalRWorker: BackgroundService
 {

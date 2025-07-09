@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace fabric_core;
+namespace fabric_core.services.core_hub;
 
 public class HostHub: Hub
 {

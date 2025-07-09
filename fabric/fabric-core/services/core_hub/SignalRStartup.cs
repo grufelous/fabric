@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace fabric_core;
+namespace fabric_core.services.core_hub;
 
 internal class SignalRStartup
 {
