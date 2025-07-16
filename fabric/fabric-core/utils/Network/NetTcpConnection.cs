@@ -1,0 +1,105 @@
+﻿using System.Net;
+using System.Runtime.InteropServices;
+
+namespace fabric_core.utils.Network;
+
+internal static class NetTcpConnection
+{
+    private enum TcpTableClass : int
+    {
+        TCP_TABLE_OWNER_PID_ALL = 5
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MibTcp4RowOwnerPid
+    {
+        public uint State;
+        public uint LocalAddr;
+        public uint LocalPort;
+        public uint RemoteAddr;
+        public uint RemotePort;
+        public uint OwningPid;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MibTcp4TableOwnerPid
+    {
+        public uint NumEntries;
+    }
+
+    [DllImport("iphlpapi.dll", SetLastError = true)]
+    private static extern uint GetExtendedTcpTable(
+        IntPtr tcpTable,
+        ref int tcpTableLength,
+        bool sort,
+        int ipVersion,
+        TcpTableClass taleClass,
+        uint reserved = 0
+    );
+
+    public static IEnumerable<(IPEndPoint Local, IPEndPoint Remote, int Pid)> GetAllTcpV4Connections()
+    {
+        int AF_INET = 2;
+        int bufferSize = 0;
+
+        uint result = GetExtendedTcpTable(IntPtr.Zero, ref bufferSize, true, AF_INET, TcpTableClass.TCP_TABLE_OWNER_PID_ALL);
+
+        IntPtr buffer = Marshal.AllocHGlobal(bufferSize);
+
+        try
+        {
+            result = GetExtendedTcpTable(buffer, ref bufferSize, true, AF_INET, TcpTableClass.TCP_TABLE_OWNER_PID_ALL);
+
+            if(result != 0)
+            {
+                yield break;
+            }
+
+            var table = Marshal.PtrToStructure<MibTcp4TableOwnerPid>(buffer);
+            long rowPtr = buffer.ToInt64() + Marshal.SizeOf<MibTcp4TableOwnerPid>();
+
+            for (int i = 0; i < table.NumEntries; i++)
+            {
+                var row = Marshal.PtrToStructure<MibTcp4RowOwnerPid>(new nint(rowPtr));
+                rowPtr += Marshal.SizeOf<MibTcp4RowOwnerPid>();
+
+                int localPort = ((int)row.LocalPort >> 8) | ((int)row.LocalPort & 0xFF) << 8;
+                int remotePort = ((int)row.RemotePort >> 8) | ((int)row.RemotePort & 0xFF) << 8;
+
+                var localIp = new IPAddress(row.LocalAddr);
+                var remoteIp = new IPAddress(row.RemoteAddr);
+
+                yield return (
+                    new IPEndPoint(localIp, localPort),
+                    new IPEndPoint(remoteIp, remotePort),
+                    (int)row.OwningPid
+                );
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(buffer);
+        }
+    }
+
+    public static int? GetOwningProcessId(
+        IPAddress remoteIp, int remotePort,
+        IPAddress localIp, int localPort
+    )
+    {
+        foreach(var entry in GetAllTcpV4Connections())
+        {
+            Console.WriteLine($"Remote (entry local): {entry.Local.Address}:{entry.Local.Port}\tLocal (entry remote): {entry.Remote.Address}:{entry.Remote.Port}\tProcess: {entry.Pid}");
+            if(
+                (entry.Local.Port == remotePort) &&
+                (entry.Local.Address.Equals(remoteIp)) &&
+                (entry.Remote.Port == localPort) &&
+                (entry.Remote.Address.Equals(localIp))
+            )
+            {
+                return entry.Pid;
+            }
+        }
+        return null;
+    }
+}
