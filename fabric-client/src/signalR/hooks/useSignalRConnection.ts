@@ -10,32 +10,30 @@ export const useSignalRConnection = () => {
         console.log('Received on connection: ', ...args);
     }, []);
 
-    if(!isInitialized.current) {
-        isInitialized.current = true;
-        const newConnection = new HubConnectionBuilder()
-            .withUrl('http://localhost:5000/fabric_core_hub', {
-                withCredentials: true,
-            })
-            .withAutomaticReconnect()
-            .build();
-        
-        newConnection.on(ClientEvents.CONNECTED, onConnectedHandler);
-
-        connection.current = newConnection;
-        connection.current.start()
-            .then(() => {
-                console.log("🚀 ~ SignalR connection established!");
-            })
-            .catch((error: any) => {
-                console.error("🚀 ~ SignalR connection failed!", error);
-            });
-    };
-
     useEffect(() => {
+        if(!isInitialized.current) {
+            isInitialized.current = true;
+            const newConnection = new HubConnectionBuilder()
+                .withUrl('http://localhost:5000/fabric_core_hub', {
+                    withCredentials: true,
+                })
+                .withAutomaticReconnect()
+                .build();
+            
+            newConnection.on(ClientEvents.CONNECTED, onConnectedHandler);
+
+            connection.current = newConnection;
+            connection.current.start()
+                .then(() => {
+                    console.log("🚀 ~ SignalR connection established!");
+                })
+                .catch((error: any) => {
+                    console.error("🚀 ~ SignalR connection failed!", error);
+                });
+        };
+
         return () => {
-            if(isInitialized.current) {
-                connection.current?.stop();
-            }
+            connection.current?.stop();
         };
     }, []);
 
