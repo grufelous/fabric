@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace fabric_core.services.auth_hub;
+namespace fabric_core.hubs.auth_hub;
 
 [Authorize]
 internal class AuthHub: Hub

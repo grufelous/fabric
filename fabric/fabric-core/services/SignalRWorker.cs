@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.Extensions.Logging;
+using fabric_core.services.EntityMappingService;
+using fabric_core.hubs.CoreHub;
 
-
-namespace fabric_core.services.core_hub;
+namespace fabric_core.services;
 
 internal class SignalRWorker: BackgroundService
 {

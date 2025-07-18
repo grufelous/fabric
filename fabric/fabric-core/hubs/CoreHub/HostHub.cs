@@ -1,9 +1,10 @@
-﻿using fabric_core.utils;
+﻿using fabric_core.services.EntityMappingService;
+using fabric_core.utils;
 using fabric_core.utils.Network;
 using Microsoft.AspNet.SignalR.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 
-namespace fabric_core.services.core_hub;
+namespace fabric_core.hubs.CoreHub;
 
 public class HostHub: Hub
 {
@@ -18,12 +19,8 @@ public class HostHub: Hub
 
     public async Task SEND_MESSAGE(string message)
     {
-        _logger.SendLogAsync($"Sending {message}", "DEFAULT");
-        //Clients.Caller.
-        //string caller = Clients.Caller.ToString();
         Console.WriteLine($"Called by UserId: {Context.UserIdentifier}, Connection Id: {Context.ConnectionId}, User name: {Context.User?.Identity?.Name}");
         await Clients.All.SendAsync("RECEIVE_MESSAGE", message);
-        _logger.SendLogAsync($"Sent {message}", "DEFAULT");
     }
 
     public override Task OnConnectedAsync()

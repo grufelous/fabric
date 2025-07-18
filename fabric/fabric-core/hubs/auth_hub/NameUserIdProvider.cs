@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace fabric_core.services.auth_hub;
+namespace fabric_core.hubs.auth_hub;
 
 internal class NameUserIdProvider: IUserIdProvider
 {

@@ -1,13 +1,13 @@
-﻿using fabric_core.services.core_hub;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
+using fabric_core.hubs.CoreHub;
 
-namespace fabric_core.services.auth_hub;
+namespace fabric_core.hubs.auth_hub;
 
 internal class SignalRAuthWorker: BackgroundService
 {

@@ -1,5 +1,5 @@
-﻿using fabric_core.services.auth_hub;
-using fabric_core.services.core_hub;
+﻿using fabric_core.hubs.auth_hub;
+using fabric_core.services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 

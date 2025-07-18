@@ -12,7 +12,7 @@ namespace fabric_shared.Logger;
 public class SqliteLogger
 {
     private static readonly HttpClient _httpClient = new HttpClient();
-    private const string LOG_SERVER_ENDPOINT = "http://localhost:3030/log";
+    private const string LOG_SERVER_ENDPOINT = "http://localhost:8080/log";
     private readonly Channel<string> _logQueue = Channel.CreateUnbounded<string>();
 
     const string source = "FabricLogger";
@@ -73,24 +73,34 @@ public class SqliteLogger
         //EventLog.WriteEntry(source, message, entryType);
     }
 
-    public Task Default(string message)
-    {
-        return SendLogAsync(message, "DEFAULT");
-    }
-
-    public Task Info(string message)
+    public Task AsyncInfo(string message)
     {
         return SendLogAsync(message, "INFO");
     }
 
-    public Task Warn(string message)
+    public void Info(string message)
+    {
+        _ = AsyncInfo(message);
+    }
+
+    public Task AsyncWarn(string message)
     {
         return SendLogAsync(message, "WARNING");
     }
 
-    public Task Error(string message)
+    public void Warn(string message)
+    {
+        _ = AsyncWarn(message);
+    }
+
+    public Task AsyncError(string message)
     {
         return SendLogAsync(message, "ERROR");
+    }
+
+    public void Error(string message)
+    {
+        _ = AsyncError(message);
     }
 
     public async Task SendLogAsync(string message, string level)
