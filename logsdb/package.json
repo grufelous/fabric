@@ -1,0 +1,19 @@
+{
+  "name": "logsdb",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "sqlite-server": "node sqliteServer.js",
+    "start": "concurrently \"npm run sqlite-server\""
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.1.0",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}

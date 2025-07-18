@@ -10,7 +10,6 @@ namespace fabric_core.services.core_hub;
 
 internal class SignalRWorker: BackgroundService
 {
-    //private IHost? _webHost;
     private WebApplication? _webApp;
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) 
@@ -23,19 +22,18 @@ internal class SignalRWorker: BackgroundService
         webApplicationBuilder.WebHost.UseKestrel()
             .UseUrls("http://localhost:5000");
 
+        webApplicationBuilder.Services.AddSingleton<EntityMappings>();
+        webApplicationBuilder.Services.AddSingleton<fabric_shared.Logger.SqliteLogger>();
         webApplicationBuilder.Services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>
             {
-                policy.WithOrigins("http://localhost:3000")
+                policy.WithOrigins(["http://localhost:3000", "http://localhost:3030"])
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
             });
         });
-        webApplicationBuilder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
-            .AddNegotiate();
-        webApplicationBuilder.Services.AddAuthorization();
 
         webApplicationBuilder.Services.AddSignalR(options =>
         {
@@ -44,8 +42,7 @@ internal class SignalRWorker: BackgroundService
 
         _webApp = webApplicationBuilder.Build();
         _webApp.UseCors();
-        _webApp.UseAuthentication();
-        _webApp.UseAuthorization();
+
         _webApp.MapHub<HostHub>("/fabric_core_hub");
 
         _ = Task.Run(() => _webApp.RunAsync(cancellationToken));
@@ -58,11 +55,6 @@ internal class SignalRWorker: BackgroundService
 
     public override async Task StopAsync(CancellationToken stoppingToken)
     {
-        //if(_webHost != null)
-        //{
-        //    await _webHost.StopAsync(stoppingToken);
-        //}
-
         if(_webApp != null)
         {
             await _webApp.StopAsync(stoppingToken);

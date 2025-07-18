@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Log Dashboard</title>
+        <style>
+            table {
+                width: 100%;
+                table-layout: fixed;
+                border-collapse: collapse;
+            }
+            th, td {
+                border: 1px solid #ccc;
+                padding: 8px;
+                text-align: left;
+            }
+            th:nth-child(1), td:nth-child(1) { width: 10%; } /* Timestamp */
+            th:nth-child(2), td:nth-child(2) { width: 10%; } /* User */
+            th:nth-child(3), td:nth-child(3) { width: 12%; } /* Process */
+            th:nth-child(4), td:nth-child(4) { width: 8%; } /* Level */
+            th:nth-child(5), td:nth-child(5) { width: 60%; } /* Message */
+        </style>
+    </head>
+    <body>
+    <h2>Real-Time Logs</h2>
+    <div class="controls">
+        <input type="text" id="searchBox" placeholder="Search logs..." />
+
+        <select id="pageSize">
+            <option value="100" selected>100</option>
+            <option value="50">50</option>
+            <option value="200">200</option>
+            <option value="500">500</option>
+        </select>
+    </div>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>
+                    Timestamp
+                </th>
+                <th>
+                    User
+                </th>
+                <th>
+                    Process
+                    <select id="processFilter">
+                        <option value="">All</option>
+                    </select>
+                </th>
+                <th>
+                    Level
+                    <select id="levelFilter">
+                        <option value="">All</option>
+                    </select>
+                </th>
+                <th>
+                    Message
+                </th>
+            </tr>
+        </thead>
+        <tbody id="logTable"></tbody>
+    </table>
+    <div id="pagination"></div>
+    <div id="errorViewer"></div>
+    <script src="scripts/dashboard.js"></script>
+    </body>
+</html>
