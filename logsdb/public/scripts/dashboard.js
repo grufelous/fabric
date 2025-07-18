@@ -78,3 +78,4 @@ async function loadFilters() {
 loadFilters();
 setInterval(fetchLogs, 5000);
 
+document.getElementById("refresh").addEventListener('click', fetchLogs);
