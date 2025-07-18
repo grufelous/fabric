@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNet.SignalR.Infrastructure;
+﻿using fabric_core.utils;
+using fabric_core.utils.Network;
+using Microsoft.AspNet.SignalR.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 
 namespace fabric_core.services.core_hub;
@@ -28,6 +30,33 @@ public class HostHub: Hub
     {
         string? userName = Context.User?.Identity?.Name;
         string connectionId = Context.ConnectionId;
+
+        var cid = Context.ConnectionId;
+        var http = Context.GetHttpContext();
+        var localIp = http?.Connection.LocalIpAddress;
+        var localPort = http?.Connection.LocalPort;
+        var remoteIp = http?.Connection.RemoteIpAddress;
+        var remotePort = http?.Connection.RemotePort;
+
+        Console.WriteLine($"Local: {localIp}:{localPort}\tRemote: {remoteIp}:{remotePort}");
+
+        if (remotePort.HasValue && localPort.HasValue)
+        {
+            int? pid = NetTcpConnection.GetOwningProcessId(remoteIp, remotePort.Value, localIp, localPort.Value);
+            Console.WriteLine($"Found pid: {pid}");
+            if (pid.HasValue)
+            {
+                Console.WriteLine($"Received pid: {pid}");
+
+                (string? name, string? owner) = Processes.GetProcessInfo(pid.Value);
+
+                Console.WriteLine($"Process name: {name}, owned by: {owner}");
+            } else
+            {
+                Console.WriteLine($"Did not find any pid");
+            }
+        }
+        
         Console.WriteLine($"Connected to user: {userName} ({connectionId})");
 
         string addedValue = _entityMappings.ConnectionIdToWindowsUser.AddOrUpdate(connectionId, userName ?? $"Unknown_{connectionId}", (key, oldValue) => userName ?? $"UnknownUpdated_{connectionId}");
