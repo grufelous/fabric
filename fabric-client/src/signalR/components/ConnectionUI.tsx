@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { useConnectionProvider } from "../contexts";
 import { ClientEvents, HostEvents } from '../constants';
 
@@ -9,7 +10,9 @@ export const ConnectionUI = () => {
     const [input, setInput] = useState<string>('');
 
     const handleSend = useCallback((messageToSend: string) => {
-        connection?.invoke(HostEvents.SEND_MESSAGE, messageToSend);
+        console.log("Sending...");
+        console.log(connection);
+        connection?.invoke('SendMessageToAgent', messageToSend);
         setInput('');
     }, [connection]);
 
@@ -17,6 +20,15 @@ export const ConnectionUI = () => {
         setMessages(currentMessages => [...currentMessages, message]);
     }, []);
 
+    const handleStart = useCallback(() => {
+        console.log("Starting...");
+        connection?.invoke('StartAgent');
+    }, [connection]);
+
+    const handleStop = useCallback(() => {
+        console.log("Stopping...");
+        connection?.invoke('StopAgent');
+    }, [connection]);
 
     useEffect(() => {
         console.log("🚀 ~ Connection state is: ", connection?.state);
@@ -31,7 +43,11 @@ export const ConnectionUI = () => {
 
     return (
         <div className='flex flex-col'>
-            <h4>Connection state: {state}</h4>
+            {/* <h4>Connection state: {state}</h4> */}
+            <div className='flex'>
+                <button onClick={handleStart}>Start process</button>
+                <button onClick={handleStop}>Kill process</button>
+            </div>
             <ul>
                 {messages.map(message => (
                     <li>{message}</li>

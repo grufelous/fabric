@@ -1,9 +1,9 @@
-import { useRef, useEffect, useMemo, useCallback } from 'react';
+import { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { ClientEvents } from '../constants';
 
 export const useSignalRConnection = () => {
-    const connection = useRef<HubConnection>(null);
+    const [connection, setConnection] = useState<HubConnection | null>(null);
     const isInitialized = useRef<boolean>(false);
 
     const onConnectedHandler = useCallback((...args: any[]) => {
@@ -21,26 +21,27 @@ export const useSignalRConnection = () => {
                 .build();
             
             newConnection.on(ClientEvents.CONNECTED, onConnectedHandler);
-
-            connection.current = newConnection;
-            connection.current.start()
+            newConnection.start()
                 .then(() => {
                     console.log("🚀 ~ SignalR connection established!");
                 })
                 .catch((error: any) => {
                     console.error("🚀 ~ SignalR connection failed!", error);
                 });
+
+            setConnection(newConnection);
         };
 
         return () => {
-            connection.current?.stop();
+            connection?.stop();
         };
     }, []);
 
-    const connectionState = useMemo(() => connection.current?.state, [connection.current?.state]);
+    const connectionState = useMemo(() => connection?.state, [connection?.state]);
+    console.log("🚀 ~ useSignalRConnection ~ connection:", connection)
 
-    return useMemo(() => ({
-        connection: connection.current,
+    return ({
+        connection,
         state: connectionState,
-    }), [connection, connectionState]);
+    });
 };

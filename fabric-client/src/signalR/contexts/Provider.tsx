@@ -8,6 +8,7 @@ const ConnectionContext = createContext<ConnectionCtxValue>({} as ConnectionCtxV
 
 export const ConnectionProvider = ({ children } : {children: ReactNode }) => {
     const value = useSignalRConnection();
+    console.log("🚀 ~ ConnectionProvider ~ value:", value)
 
     return (
         <ConnectionContext.Provider value={value}>
