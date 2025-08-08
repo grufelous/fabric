@@ -12,8 +12,8 @@ namespace fabric_shared.Logger;
 public class SqliteLogger
 {
     private static readonly HttpClient _httpClient = new HttpClient();
-    private const string LOG_SERVER_ENDPOINT = "http://localhost:8080/log";
-    private readonly Channel<string> _logQueue = Channel.CreateUnbounded<string>();
+    private const string LOG_SERVER_ENDPOINT = "http://localhost:3030/log";
+    private static readonly Channel<string> _logQueue = Channel.CreateUnbounded<string>();
 
     const string source = "FabricLogger";
     const string logName = "Application";
@@ -105,6 +105,7 @@ public class SqliteLogger
 
     public async Task SendLogAsync(string message, string level)
     {
+        Console.WriteLine($"LOG_{level}:\t{message}");
         var log = CreateLogObject(message, level);
         string logString = JsonSerializer.Serialize(log);
         LogToEventViewer(message, level);

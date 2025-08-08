@@ -23,8 +23,11 @@ internal class SignalRWorker: BackgroundService
         webApplicationBuilder.WebHost.UseKestrel()
             .UseUrls("http://localhost:5000");
 
-        webApplicationBuilder.Services.AddSingleton<EntityMappings>();
+        
         webApplicationBuilder.Services.AddSingleton<fabric_shared.Logger.SqliteLogger>();
+        webApplicationBuilder.Services.AddSingleton<EntityMappings>();
+        webApplicationBuilder.Services.AddSingleton<ProcessCommunicator.ProcessCommunicator>();
+
         webApplicationBuilder.Services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>
