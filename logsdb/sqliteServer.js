@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const db = new sqlite3.Database('events.db');
 
-const PORT = 8080;
+const PORT = 3030;
 
 app.use(bodyParser.json());
 
