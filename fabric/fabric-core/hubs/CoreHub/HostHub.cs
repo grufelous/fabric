@@ -1,9 +1,10 @@
 ﻿using fabric_core.services.EntityMappingService;
 using fabric_core.services.ProcessCommunicator;
-using fabric_core.utils;
+using fabric_core.utils.Processes;
 using fabric_core.utils.Network;
 using Microsoft.AspNet.SignalR.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
+using fabric_core.utils.User;
 
 namespace fabric_core.hubs.CoreHub;
 
@@ -67,9 +68,15 @@ public class HostHub: Hub
             {
                 _logger.Info($"Processing this pid: {pid}");
 
-                (string? name, string? owner) = Processes.GetProcessInfo(pid.Value);
+                (String? name, String? owner) = ProcessQueries.GetProcessInfo(pid.Value);
 
-                _logger.Info($"Found process name: {name}, owned by: {owner}");
+                _logger.Info($"Found process name: '{name}', owned by: '{owner}'");
+
+                if (owner != null)
+                {
+                    IntPtr userToken = UserQueries.GetUserTokenByName(owner, _logger);
+                    _logger.Info($"Received userToken: '{userToken}'");
+                }
 
                 user = owner;
             } else

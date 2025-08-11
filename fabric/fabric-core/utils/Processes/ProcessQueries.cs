@@ -3,31 +3,31 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace fabric_core.utils;
+namespace fabric_core.utils.Processes;
 
-internal class Processes
+internal class ProcessQueries
 {
     [DllImport("advapi32.dll", SetLastError = true)]
     static extern bool OpenProcessToken(
-        IntPtr ProcessHandle,
+        nint ProcessHandle,
         uint DesiredAccess,
-        out IntPtr TokenHandle
+        out nint TokenHandle
     );
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    static extern IntPtr OpenProcess(
+    static extern nint OpenProcess(
         uint processAccess,
         bool bInheritHandle,
         int processId
     );
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    static extern bool CloseHandle(IntPtr hObject);
+    static extern bool CloseHandle(nint hObject);
 
     [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     static extern bool LookupAccountSid(
         string? lpSystemName,
-        IntPtr Sid,
+        nint Sid,
         StringBuilder Name,
         ref uint cchName,
         StringBuilder ReferencedDomainName,
@@ -37,9 +37,9 @@ internal class Processes
 
     [DllImport("advapi32.dll", SetLastError = true)]
     static extern bool GetTokenInformation(
-        IntPtr TokenHandle,
+        nint TokenHandle,
         TOKEN_INFORMATION_CLASS TokenInformationClass,
-        IntPtr TokenInformation,
+        nint TokenInformation,
         uint TokenInformationLength,
         out uint ReturnLength
     );
@@ -58,7 +58,7 @@ internal class Processes
     [StructLayout(LayoutKind.Sequential)]
     struct _SID_AND_ATTRIBUTES
     {
-        public IntPtr Sid;
+        public nint Sid;
         public uint Attributes;
     }
 
@@ -85,8 +85,8 @@ internal class Processes
             Console.WriteLine(e.ToString());
         }
 
-        IntPtr hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
-        if (hProcess == IntPtr.Zero)
+        nint hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
+        if (hProcess == nint.Zero)
         {
             return (name, null);
         }
@@ -97,15 +97,16 @@ internal class Processes
             return (name, null);
         }
 
-        GetTokenInformation(hToken, TOKEN_INFORMATION_CLASS.TokenUser, IntPtr.Zero, 0, out var reqLength);
-        IntPtr tokenInfo = Marshal.AllocHGlobal((int)reqLength);
+        GetTokenInformation(hToken, TOKEN_INFORMATION_CLASS.TokenUser, nint.Zero, 0, out var reqLength);
+        nint tokenInfo = Marshal.AllocHGlobal((int)reqLength);
 
         try
         {
             if (GetTokenInformation(hToken, TOKEN_INFORMATION_CLASS.TokenUser, tokenInfo, reqLength, out _))
             {
                 var tokenUser = Marshal.PtrToStructure<TOKEN_USER>(tokenInfo);
-                IntPtr pSid = tokenUser.User.Sid;
+                nint pSid = tokenUser.User.Sid;
+                Console.WriteLine($"User details: {tokenUser.User.Sid}");
 
                 var nameSb = new StringBuilder(256);
                 var domSb = new StringBuilder(256);

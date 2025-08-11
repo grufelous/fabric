@@ -25,6 +25,9 @@ public class ProcessCommunicator
     public ProcessCommunicator(fabric_shared.Logger.SqliteLogger sqliteLogger)
     {
         _logger = sqliteLogger;
+        string? envAgentPath = System.Environment.GetEnvironmentVariable("FABRIC_AGENT_PATH");
+        processPath = envAgentPath ?? processPath;
+        _logger.Info($"Agent process path: {processPath}");
     }
 
     private void NewAgentProcess_Exited(object? sender, EventArgs e)
