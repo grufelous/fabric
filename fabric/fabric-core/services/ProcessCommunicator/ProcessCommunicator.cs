@@ -1,8 +1,11 @@
-﻿using System;
+﻿using fabric_core.utils.Processes;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Pipes;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -65,12 +68,22 @@ public class ProcessCommunicator
     {
         try
         {
-            NamedPipeServerStream newPipeServer = new NamedPipeServerStream(
+            PipeSecurity worldAllowed = new PipeSecurity();
+            worldAllowed.AddAccessRule(new PipeAccessRule(
+                new SecurityIdentifier(WellKnownSidType.WorldSid, null),
+                PipeAccessRights.ReadWrite,
+                AccessControlType.Allow
+            ));
+
+            NamedPipeServerStream newPipeServer = NamedPipeServerStreamAcl.Create(
                 pipeName,
                 PipeDirection.InOut,
-                maxNumberOfServerInstances: 1,
+                1,
                 PipeTransmissionMode.Message,
-                PipeOptions.Asynchronous
+                PipeOptions.Asynchronous,
+                4096,
+                4096,
+                worldAllowed
             );
 
             _logger.Info($"Waiting for pipe client to connect on {pipeName}...");
@@ -96,6 +109,29 @@ public class ProcessCommunicator
         return false;
     }
 
+    //private async Task<Boolean> ConnectPipeForUser(String username)
+    //{
+    //    try
+    //    {
+
+    //    }
+    //}
+
+    //private static PipeSecurity CreatePipeSecurityForUser(String username)
+    //{
+    //    PipeSecurity security = new PipeSecurity();
+    //    security.AddAccessRule(new PipeAccessRule(
+    //        new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null),
+    //        PipeAccessRights.FullControl,
+    //        AccessControlType.Allow
+    //        ));
+    //    security.AddAccessRule(new PipeAccessRule(
+    //        new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null),
+    //        PipeAccessRights.FullControl,
+    //        AccessControlType.Allow
+    //        ));
+    //}
+
     public async Task<Boolean> CreateAndLaunchProcess()
     {
         try
@@ -120,6 +156,36 @@ public class ProcessCommunicator
         catch (Exception ex)
         {
             _logger.Error($"Error launching agent process: {ex.Message}\n{ex.StackTrace}");
+        }
+        return false;
+    }
+
+    public async Task<Boolean> CreateAndLaunchProcess(String userName)
+    {
+        try
+        {
+            Process? newAgentProcess = ProcessLauncher.Launch(processPath, userName, _logger);
+            if (newAgentProcess != null)
+            {
+                _logger.Info($"Process launched: {newAgentProcess.ProcessName} at {newAgentProcess.Id}");
+
+                newAgentProcess.Exited += NewAgentProcess_Exited;
+
+                agentProcess = newAgentProcess;
+                await ConnectPipe();
+
+                return true;
+            }
+            else
+            {
+                
+                _logger.Info($"No process launched?");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Error launching agent process for user '{userName}': {ex.Message}\n{ex.StackTrace}");
         }
         return false;
     }

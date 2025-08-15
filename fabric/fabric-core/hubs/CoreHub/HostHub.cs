@@ -29,8 +29,18 @@ public class HostHub: Hub
 
     public async Task StartAgent()
     {
-        _logger.Info("Received command to start agent process...");
-        await _communicator.CreateAndLaunchProcess();
+        String connectionId = Context.ConnectionId;
+        bool hasValue = _entityMappings.ConnectionIdToWindowsUser.TryGetValue(connectionId, out String? userName);
+        if (userName != null)
+        {
+            _logger.Info($"Received command to start agent process for {userName}...");
+            await _communicator.CreateAndLaunchProcess(userName);
+        }
+        else
+        {
+            _logger.Warn($"No user associated to connectionId {connectionId}. Ignoring start command.");
+        }
+        
     }
 
     public async Task StopAgent()
