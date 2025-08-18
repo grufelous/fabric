@@ -29,4 +29,9 @@
 	  <ProjectReference Include="..\fabric-shared\fabric-shared.csproj" />
 	</ItemGroup>
 
+	<PropertyGroup>
+		<NoWarn>CA1416</NoWarn>
+	</PropertyGroup>
+
+
 </Project>

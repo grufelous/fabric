@@ -14,9 +14,9 @@ internal class Program
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddHostedService<SignalRWorker>();
-                services.AddHostedService<SignalRAuthWorker>();
             })
             .Build();
+        Console.WriteLine("Built host. Running...");
         host.Run();
     }
 
