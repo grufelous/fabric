@@ -12,7 +12,7 @@ namespace fabric_shared.Logger;
 public class SqliteLogger
 {
     private static readonly HttpClient _httpClient = new HttpClient();
-    private const string LOG_SERVER_ENDPOINT = "http://localhost:3030/log";
+    private string LOG_SERVER_ENDPOINT = "http://localhost:3030/log";
     private static readonly Channel<string> _logQueue = Channel.CreateUnbounded<string>();
 
     const string source = "FabricLogger";
@@ -20,6 +20,9 @@ public class SqliteLogger
 
     public SqliteLogger()
     {
+        string? loggerUrl = System.Environment.GetEnvironmentVariable("FABRIC_LOGGER_URL");
+        Console.WriteLine($"Read logger URL: {loggerUrl}");
+        LOG_SERVER_ENDPOINT = loggerUrl != null ? $"{loggerUrl}/log" : LOG_SERVER_ENDPOINT;
         Console.WriteLine("Making shared logger");
 
         //if (!EventLog.SourceExists(source))
