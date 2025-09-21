@@ -12,64 +12,63 @@ using System.Threading.Tasks;
 
 namespace fabric_core.utils.Processes;
 
-[StructLayout(LayoutKind.Sequential)]
-internal struct PROCESS_INFORMATION
+public class ProcessLauncher
 {
-    public IntPtr hProcess;
-    public IntPtr hThread;
-    public uint dwProcessId;
-    public uint dwThreadId;
-}
+    [StructLayout(LayoutKind.Sequential)]
+    private struct PROCESS_INFORMATION
+    {
+        public IntPtr hProcess;
+        public IntPtr hThread;
+        public uint dwProcessId;
+        public uint dwThreadId;
+    }
 
-[StructLayout(LayoutKind.Sequential)]
-internal struct SECURITY_ATTRIBUTES
-{
-    public uint nLength;
-    public IntPtr lpSecurityDescriptor;
-    public bool bInheritHandle;
-}
+    [StructLayout(LayoutKind.Sequential)]
+    private struct SECURITY_ATTRIBUTES
+    {
+        public uint nLength;
+        public IntPtr lpSecurityDescriptor;
+        public bool bInheritHandle;
+    }
 
-[StructLayout(LayoutKind.Sequential)]
-internal struct STARTUPINFO
-{
-    public uint cb;
-    public string lpReserved;
-    public string lpDesktop;
-    public string lpTitle;
-    public uint dwX;
-    public uint dwY;
-    public uint dwXSize;
-    public uint dwYSize;
-    public uint dwXCountChars;
-    public uint dwYCountChars;
-    public uint dwFillAttribute;
-    public uint dwFlags;
-    public short wShowWindow;
-    public short cbReserved2;
-    public IntPtr lpReserved2;
-    public IntPtr hStdInput;
-    public IntPtr hStdOutput;
-    public IntPtr hStdError;
+    [StructLayout(LayoutKind.Sequential)]
+    private struct STARTUPINFO
+    {
+        public uint cb;
+        public string lpReserved;
+        public string lpDesktop;
+        public string lpTitle;
+        public uint dwX;
+        public uint dwY;
+        public uint dwXSize;
+        public uint dwYSize;
+        public uint dwXCountChars;
+        public uint dwYCountChars;
+        public uint dwFillAttribute;
+        public uint dwFlags;
+        public short wShowWindow;
+        public short cbReserved2;
+        public IntPtr lpReserved2;
+        public IntPtr hStdInput;
+        public IntPtr hStdOutput;
+        public IntPtr hStdError;
 
-}
+    }
 
-internal enum SECURITY_IMPERSONATION_LEVEL
-{
-    SecurityAnonymous,
-    SecurityIdentification,
-    SecurityImpersonation,
-    SecurityDelegation
-}
+    private enum SECURITY_IMPERSONATION_LEVEL
+    {
+        SecurityAnonymous,
+        SecurityIdentification,
+        SecurityImpersonation,
+        SecurityDelegation
+    }
 
-internal enum TOKEN_TYPE
-{
-    TokenPrimary = 1,
-    TokenImpersonation
-}
+    private enum TOKEN_TYPE
+    {
+        TokenPrimary = 1,
+        TokenImpersonation
+    }
 
-
-internal class ProcessLauncher
-{
     [DllImport("advapi32.dll", SetLastError = true)]
     private static extern bool CreateProcessAsUser(
         IntPtr hToken,
@@ -127,7 +126,7 @@ internal class ProcessLauncher
 
     private static SqliteLogger? logger;
 
-    private static Process? LaunchProcessAsUser(string cmdLine, IntPtr token, IntPtr envBlock)
+    private Process? LaunchProcessAsUser(string cmdLine, IntPtr token, IntPtr envBlock)
     {
         bool result = false;
 
@@ -186,7 +185,7 @@ internal class ProcessLauncher
         return result ? Process.GetProcessById((int)pi.dwProcessId) : null;
     }
 
-    public static IntPtr GetPrimaryToken(int processId)
+    private IntPtr GetPrimaryToken(int processId)
     {
         IntPtr token = IntPtr.Zero;
         IntPtr primaryToken = IntPtr.Zero;
@@ -246,7 +245,7 @@ internal class ProcessLauncher
 
     }
 
-    public static IntPtr GetEnvironmentBlock(IntPtr token)
+    private IntPtr GetEnvironmentBlock(IntPtr token)
     {
 
         IntPtr envBlock = IntPtr.Zero;
@@ -265,7 +264,7 @@ internal class ProcessLauncher
         return envBlock;
     }
 
-    public static Process? Launch(string appCmdLine, string targetUserName, SqliteLogger _logger, string flags = "")
+    public Process? Launch(string appCmdLine, string targetUserName, SqliteLogger _logger, string flags = "")
     {
         Process? process = null;
         logger = _logger;
@@ -278,15 +277,15 @@ internal class ProcessLauncher
             return null;
         }
 
-        IntPtr envBlock = GetEnvironmentBlock(token);
+        IntPtr envBlock = this.GetEnvironmentBlock(token);
         process = LaunchProcessAsUser(appCmdLine + " " + flags, token, envBlock);
 
-        if(envBlock != IntPtr.Zero)
+        if (envBlock != IntPtr.Zero)
         {
             DestroyEnvironmentBlock(envBlock);
         }
         CloseHandle(token);
         return process;
     }
-    
+
 }

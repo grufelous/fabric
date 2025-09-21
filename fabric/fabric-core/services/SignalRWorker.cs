@@ -1,5 +1,6 @@
 ﻿using fabric_core.hubs.CoreHub;
 using fabric_core.services.EntityMappingService;
+using fabric_core.utils.Processes;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,7 +29,9 @@ internal class SignalRWorker: BackgroundService
 
         webApplicationBuilder.Services.AddSingleton<fabric_shared.Logger.SqliteLogger>();
         webApplicationBuilder.Services.AddSingleton<EntityMappings>();
+        webApplicationBuilder.Services.AddSingleton<ProcessLauncher>();
         webApplicationBuilder.Services.AddSingleton<ProcessCommunicator.ProcessCommunicator>();
+        
 
         webApplicationBuilder.Services.AddCors(options =>
         {

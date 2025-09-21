@@ -19,7 +19,7 @@ internal class UserQueries
         out int pCount
     );
 
-    [DllImport("wtsapi32.dll")]
+    [DllImport("wtsapi32.dll", SetLastError = true)]
     static extern void WTSFreeMemory(IntPtr memory);
 
     [DllImport("wtsapi32.dll", SetLastError = true)]
@@ -104,7 +104,8 @@ internal class UserQueries
                     }
                     else
                     {
-                        logger.Info($"Did not find token for username '{userName}': {token}");
+                        var err = Marshal.GetLastWin32Error();
+                        logger.Error($"Did not find token for username '{userName}': {token}\nError from user query: {err}");
                     }
                 }
                 else
@@ -112,7 +113,8 @@ internal class UserQueries
                     logger.Info($"Calculated username: '{completeName}' and target username: '{targetUserName}' are not equal!");
                 }
             }
-        } finally
+        }
+        finally
         {
             if (sessionInfoPtr != IntPtr.Zero)
             {

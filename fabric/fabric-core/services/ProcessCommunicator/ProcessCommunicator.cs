@@ -14,6 +14,7 @@ namespace fabric_core.services.ProcessCommunicator;
 public class ProcessCommunicator
 {
     private fabric_shared.Logger.SqliteLogger _logger;
+    private ProcessLauncher _processLauncher;
 
     private readonly String processPath = @"C:\code\dotnet\fabric\fabric\fabric-agent\bin\Release\net8.0\publish\win-x86\fabric-agent.exe";
     private readonly String pipeName = "FABRIC_PIPE";
@@ -25,9 +26,10 @@ public class ProcessCommunicator
 
     private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
-    public ProcessCommunicator(fabric_shared.Logger.SqliteLogger sqliteLogger)
+    public ProcessCommunicator(fabric_shared.Logger.SqliteLogger sqliteLogger, ProcessLauncher processLauncher)
     {
         _logger = sqliteLogger;
+        _processLauncher = processLauncher;
         string? envAgentPath = System.Environment.GetEnvironmentVariable("FABRIC_AGENT_PATH");
         processPath = envAgentPath ?? processPath;
         _logger.Info($"Agent process path: {processPath}");
@@ -164,7 +166,7 @@ public class ProcessCommunicator
     {
         try
         {
-            Process? newAgentProcess = ProcessLauncher.Launch(processPath, userName, _logger);
+            Process? newAgentProcess = _processLauncher.Launch(processPath, userName, _logger);
             if (newAgentProcess != null)
             {
                 _logger.Info($"Process launched: {newAgentProcess.ProcessName} at {newAgentProcess.Id}");
@@ -178,7 +180,7 @@ public class ProcessCommunicator
             }
             else
             {
-                
+
                 _logger.Info($"No process launched?");
             }
 

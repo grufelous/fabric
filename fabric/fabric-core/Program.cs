@@ -23,6 +23,8 @@ internal class Program
     static void Main(string[] args)
     {
         Console.WriteLine("Hello, World!");
+        string? loggerUrl = System.Environment.GetEnvironmentVariable("FABRIC_LOGGER_URL");
+        Console.WriteLine($"Read logger URL: {loggerUrl}");
         CreateAndRunHost(args);
     }
 }

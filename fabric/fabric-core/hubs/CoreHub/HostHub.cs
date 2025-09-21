@@ -13,12 +13,14 @@ public class HostHub: Hub
     private EntityMappings _entityMappings;
     private fabric_shared.Logger.SqliteLogger _logger;
     private ProcessCommunicator _communicator;
+    private ProcessLauncher _processLauncher;
 
-    public HostHub(EntityMappings entityMappings, fabric_shared.Logger.SqliteLogger sqliteLogger, ProcessCommunicator communicator)
+    public HostHub(EntityMappings entityMappings, fabric_shared.Logger.SqliteLogger sqliteLogger, ProcessCommunicator communicator, ProcessLauncher processLauncher)
     {
         _entityMappings = entityMappings;
         _logger = sqliteLogger;
         _communicator = communicator;
+        _processLauncher = processLauncher;
     }
 
     public async Task SEND_MESSAGE(string message)
@@ -40,10 +42,10 @@ public class HostHub: Hub
         {
             _logger.Warn($"No user associated to connectionId {connectionId}. Ignoring start command.");
         }
-        
+
     }
 
-    public async Task StopAgent()
+    public void StopAgent()
     {
         _logger.Info("Received command to stop agent process...");
         _communicator.TerminateProcess();
@@ -85,7 +87,7 @@ public class HostHub: Hub
                 if (owner != null)
                 {
                     IntPtr userToken = UserQueries.GetUserTokenByName(owner, _logger);
-                    _logger.Info($"Received userToken: '{userToken}'");
+                    _logger.Info($"Received userToken: ''");
                 }
 
                 user = owner;
