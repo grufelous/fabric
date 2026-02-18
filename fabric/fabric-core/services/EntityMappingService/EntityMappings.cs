@@ -1,6 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using fabric_shared.Models;
+using System.Collections.Concurrent;
 
-namespace fabric_core.services.core_hub;
+namespace fabric_core.services.EntityMappingService;
 
 public class EntityMappings
 {

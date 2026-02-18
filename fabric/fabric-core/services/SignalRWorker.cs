@@ -1,12 +1,15 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Builder;
+﻿using fabric_core.hubs.CoreHub;
+using fabric_core.services.EntityMappingService;
+using fabric_core.utils.Processes;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using static System.Net.WebRequestMethods;
 
-
-namespace fabric_core.services.core_hub;
+namespace fabric_core.services;
 
 internal class SignalRWorker: BackgroundService
 {
@@ -14,6 +17,7 @@ internal class SignalRWorker: BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) 
     {
+        Console.WriteLine("Starting execute async");
         WebApplicationBuilder webApplicationBuilder = WebApplication.CreateBuilder();
 
         webApplicationBuilder.Logging.AddConsole();
@@ -22,13 +26,18 @@ internal class SignalRWorker: BackgroundService
         webApplicationBuilder.WebHost.UseKestrel()
             .UseUrls("http://localhost:5000");
 
-        webApplicationBuilder.Services.AddSingleton<EntityMappings>();
+
         webApplicationBuilder.Services.AddSingleton<fabric_shared.Logger.SqliteLogger>();
+        webApplicationBuilder.Services.AddSingleton<EntityMappings>();
+        webApplicationBuilder.Services.AddSingleton<ProcessLauncher>();
+        webApplicationBuilder.Services.AddSingleton<ProcessCommunicator.ProcessCommunicator>();
+        
+
         webApplicationBuilder.Services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>
             {
-                policy.WithOrigins(["http://localhost:3000", "http://localhost:3030"])
+                policy.WithOrigins(["http://localhost:3000", "http://localhost:3030", "http://10.0.2.2:3000", "http://10.0.2.2:3030"])
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();

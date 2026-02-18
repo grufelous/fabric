@@ -1,5 +1,5 @@
-﻿using fabric_core.services.auth_hub;
-using fabric_core.services.core_hub;
+﻿using fabric_core.hubs.auth_hub;
+using fabric_core.services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -14,15 +14,17 @@ internal class Program
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddHostedService<SignalRWorker>();
-                services.AddHostedService<SignalRAuthWorker>();
             })
             .Build();
+        Console.WriteLine("Built host. Running...");
         host.Run();
     }
 
     static void Main(string[] args)
     {
         Console.WriteLine("Hello, World!");
+        string? loggerUrl = System.Environment.GetEnvironmentVariable("FABRIC_LOGGER_URL");
+        Console.WriteLine($"Read logger URL: {loggerUrl}");
         CreateAndRunHost(args);
     }
 }
